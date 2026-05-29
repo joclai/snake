@@ -285,7 +285,8 @@
 
         function resize() {
             const rect = wrapper.getBoundingClientRect();
-            const size = Math.floor(Math.min(rect.width, rect.height) - 2);
+            let size = Math.floor(Math.min(rect.width, rect.height) - 2);
+            if (size < 32) size = 300; // fallback before layout
             canvas.width = size;
             canvas.height = size;
             cellSize = size / GRID;
@@ -627,9 +628,10 @@
         highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
         applyTheme(themeState);
         initState();
-        draw();
         updateScore();
         document.getElementById('startOverlay').classList.add('show');
+        // Defer first draw to let layout settle (avoids 0-size canvas gradient)
+        setTimeout(() => { resize(); draw(); }, 50);
     </script>
 </body>
 </html>
